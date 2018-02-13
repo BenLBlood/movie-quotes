@@ -10,21 +10,20 @@
   <div class="container">
     <div class="card">
       <div class="card-body">
-        <form>
+        <form (ngSubmit)="onSubmit()" #movieQuoteForm="ngForm">
           <div class="form-group">
-            <input type="text" class="form-control" placeholder="Quote" name="quote" [(ngModel)]="movieQuote.quote">
+            <input required type="text" class="form-control" placeholder="Quote" name="quote" [(ngModel)]="movieQuote.quote">
             <br>
           </div>
           <div class="form-group">
-            <input type="text" class="form-control" placeholder="from Movie" name="movie" [(ngModel)]="movieQuote.movie">
+            <input required type="text" class="form-control" placeholder="from Movie" name="movie" [(ngModel)]="movieQuote.movie">
           </div>
           <p *ngIf="movieQuote.movie && movieQuote.quote">
             The best quote from
             <b>{{movieQuote.movie}}</b> is
             <b>"{{movieQuote.quote}}"</b>
           </p>
-          <button type="button" class="btn btn-info float-right"
-          (click)="onSubmit()">Submit</button>
+          <button [disabled]="!movieQuoteForm.form.valid" type="submit" class="btn btn-info float-right">Submit</button>
         </form>
       </div>
     </div>
