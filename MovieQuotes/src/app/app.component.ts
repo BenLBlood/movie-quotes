@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { AngularFirestore, AngularFirestoreCollection  } from 'angularfire2/firestore';
+import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument } from 'angularfire2/firestore';
 import { Observable } from 'rxjs/Observable';
 
 interface MovieQuote {
@@ -14,8 +14,10 @@ interface MovieQuote {
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
+  private itemDoc: AngularFirestoreDocument<MovieQuote>;
   private itemsCollection: AngularFirestoreCollection<MovieQuote>;
   readonly quotesPath = "quotes";
+  readonly collectionPath = "collection"
 
   formMovieQuote: MovieQuote = {
     'quote': '',
@@ -33,19 +35,27 @@ export class AppComponent {
   movieQuotesStream: Observable<MovieQuote[]>;
   constructor(db: AngularFirestore) {
     this.itemsCollection  = db.collection<MovieQuote>(this.quotesPath);
-    this.movieQuotesStream = this.itemsCollection.valueChanges();
+    
+    this.movieQuotesStream = this.itemsCollection.snapshotChanges().map(actions => {
+      return actions.map(a => {
+        const data = a.payload.doc.data() as MovieQuote;
+        const $key = a.payload.doc.id;
+        return { $key, ...data };
+      });
+    });
+    //this.movieQuotesStream = this.itemsCollection.valueChanges();
 
-    //this.movieQuotesStream = db.collection(this.quotesPath).valueChanges();
   }
 
   onSubmit(): void {
     // Local only solution
     // this.movieQuotes.unshift(this.formMovieQuote);
     try {
-      this.itemsCollection.add(this.formMovieQuote);
-
-      //this.movieQuotesStream.push(this.formMovieQuote);
-
+      if (this.formMovieQuote.$key) {
+        this.itemsCollection.doc(this.formMovieQuote.$key).update(this.formMovieQuote);
+      } else {
+        this.itemsCollection.add(this.formMovieQuote);
+      }
       this.formMovieQuote = {
         'quote': '',
         'movie': ''
@@ -54,5 +64,14 @@ export class AppComponent {
     catch (e) {
       console.log("Form error:", e);
     }
+  }
+
+  edit(movieQuote: MovieQuote): void {
+    this.formMovieQuote = movieQuote;
+  }
+
+  remove(movieQuote: MovieQuote): void {
+    console.log(movieQuote);
+    this.itemsCollection.doc(movieQuote.$key).delete();
   }
 }

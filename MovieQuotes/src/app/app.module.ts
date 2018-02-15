@@ -9,10 +9,12 @@ import { environment } from '../environments/environment';
 import { AngularFirestoreModule } from 'angularfire2/firestore';
 import { AngularFireStorageModule } from 'angularfire2/storage';
 import { AngularFireAuthModule } from 'angularfire2/auth';
+import { ReversePipe } from './reverse.pipe';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    ReversePipe
   ],
   imports: [
     BrowserModule,

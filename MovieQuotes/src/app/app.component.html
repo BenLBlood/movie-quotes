@@ -24,7 +24,9 @@
             <b>{{formMovieQuote.movie}}</b> is
             <b>"{{formMovieQuote.quote}}"</b>
           </p>
-          <button [disabled]="!movieQuoteForm.form.valid" type="submit" class="btn btn-info float-right">Submit</button>
+          <button [disabled]="!movieQuoteForm.form.valid" type="submit" class="btn btn-info float-right">
+            {{formMovieQuote.$key ? 'Edit' : 'Submit'}}
+          </button>
         </form>
       </div>
     </div>
@@ -40,12 +42,25 @@
           <th>
             Movie
           </th>
+          <th>
+            Edit
+          </th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let movieQuote of movieQuotesStream | async">
+        <tr *ngFor="let movieQuote of (movieQuotesStream | async) | reverse">
           <td>{{movieQuote.quote}}</td>
           <td>{{movieQuote.movie}}</td>
+          <td>
+            <button type="button" class="btn btn-success btn-xs"
+              (click)="edit(movieQuote)">
+              <span class="glyphicon glyphicon-pencil"></span>
+            </button>
+            <button type="button" class="btn btn-danger btn-xs"
+              (click)="remove(movieQuote)">
+              <span class="glyphicon glyphicon-trash"></span>
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>
